@@ -30,13 +30,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # CORRECTION 1 : Le nom du projet dans angular.json est "task-wheel"
+      # Le dossier de sortie sera donc dist/task-wheel/browser
       - name: Build with Angular
         run: npm run build -- --base-href="/Task-wheel-DZ/"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'dist/Task-wheel-DZ/browser' # Remplacez 'task-wheel-dz' par le nom de votre projet dans angular.json
+          # CORRECTION 2 : Ajuster le chemin pour correspondre au nom réel du projet
+          path: 'dist/task-wheel/browser'
 
   deploy:
     environment:
