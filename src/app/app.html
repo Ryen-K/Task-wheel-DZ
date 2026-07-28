@@ -1,0 +1,174 @@
+<header class="header">
+  <img class="logo" src="https://digitalizers.ch/wp-content/uploads/2023/06/logo-digitalizers-blanc.png" alt="Digitalizers" />
+  <div class="header-actions">
+    <button class="header-btn" title="Réinitialiser avec des valeurs par défaut" (click)="resetWithDefaults()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M8 4v4l2.5 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M11 2.5L13 4l-2 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button class="header-btn" title="Réinitialiser complètement" (click)="resetAll()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M3 4h10M5.5 4V3a1 1 0 011-1h3a1 1 0 011 1v1M6 4v8a1 1 0 001 1h2a1 1 0 001-1V4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<div class="layout">
+  <!-- ─── LEFT: QUI ? ─── -->
+  <aside class="panel panel--left">
+    <div class="section-header">Qui?</div>
+
+    <div class="section">
+      <label class="label">Ajouter un membre</label>
+      <div class="input-row">
+        <input class="input" type="text" placeholder="Prénom" (keyup.enter)="addMember()" [formControl]="nameInput" [disabled]="spinning()" />
+        <button class="btn btn--primary" (click)="addMember()" [disabled]="spinning()">+</button>
+      </div>
+    </div>
+
+    <div class="compact-list">
+      <label class="label">Disponibles ({{ available().length }})</label>
+      @for (m of members(); track m.name) {
+        @if (!m.busy) {
+          <div class="member-row">
+            <button class="member-remove" (click)="removeMember(m.name)" [disabled]="spinning()">&times;</button>
+            <span class="member-name">{{ m.name }}</span>
+            <div class="weight-group">
+              <input class="weight-slider" type="range" min="1" max="10" [value]="m.weight" (input)="setWeight(m.name, +($any($event.target).value))" [disabled]="spinning()" />
+              <span class="weight-value">{{ m.weight }}</span>
+            </div>
+          </div>
+        }
+      }
+    </div>
+
+    @if (busyList().length > 0) {
+      <div class="busy-pool">
+        <div class="flex-between">
+          <span class="label">Occupés ({{ busyList().length }})</span>
+          <button class="btn btn--ghost" (click)="unbusyAll()">Tout libérer</button>
+        </div>
+        <div class="busy-list">
+          @for (m of busyList(); track m.name) {
+            <div class="busy-item" (click)="unbusy(m.name)">
+              <span class="busy-name">{{ m.name }}</span>
+              <span class="busy-hint">libérer</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </aside>
+
+  <!-- ─── CENTER: FAIT ? ─── -->
+  <main class="center">
+    <div class="section-header">Fait?</div>
+
+    <div class="wheel-area">
+      <canvas #wheelCanvas class="wheel-canvas"></canvas>
+    </div>
+
+    <div class="center-actions">
+      @if (currentTask(); as task) {
+        <div class="current-task-badge">
+          <strong>{{ task.name }}</strong>
+          <span class="badge-complexity">complexité {{ task.complexity }}/10</span>
+        </div>
+      } @else if (tasks().length > 0 && allTasksDone()) {
+        <div class="current-task-badge done">Toutes les tâches sont faites</div>
+      } @else {
+        <div class="current-task-badge hint">Ajoutez des tâches pour commencer</div>
+      }
+
+      <button class="btn btn--spin" (click)="handleAction()" [disabled]="spinning() || (tasks().length > 0 && allTasksDone())">
+        {{ buttonLabel }}
+      </button>
+    </div>
+
+    <div class="wheel-subtitle">Qui fait quoi ? La roue décide.</div>
+
+    @if (history().length > 0) {
+      <div class="history-section">
+        <div class="flex-between">
+          <span class="label">Résultats</span>
+          <div class="history-actions">
+            <button class="history-toggle" (click)="historyVisible.update(v => !v)" [class.reversed]="!historyVisible()">
+              <svg width="10" height="10" viewBox="0 0 10 6" fill="none">
+                <path d="M1 5l4-4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <button class="btn btn--ghost" (click)="resetHistory()">Effacer</button>
+          </div>
+        </div>
+        @if (historyVisible()) {
+          <div class="history-list">
+            @for (h of history(); track h.timestamp) {
+              <div class="history-entry">
+                <span class="h-user">{{ h.userName }}</span>
+                @if (h.kind === 'prise') {
+                  <span class="h-verb">a pris</span>
+                } @else {
+                  <span class="h-verb">a fini</span>
+                }
+                <span class="h-task">{{ h.taskName }}</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </main>
+
+  <!-- ─── RIGHT: QUOI ? ─── -->
+  <aside class="panel panel--right">
+    <div class="section-header">Quoi?</div>
+
+    <div class="section">
+      <label class="label">Ajouter une tâche</label>
+      <div class="input-row">
+        <input class="input" type="text" placeholder="Nom de la tâche" (keyup.enter)="addTask()" [formControl]="taskInput" [disabled]="spinning()" />
+        <button class="btn btn--primary" (click)="addTask()" [disabled]="spinning()">+</button>
+      </div>
+    </div>
+
+    <div class="task-list">
+      <label class="label">Tâches ({{ pendingTasks().length }} restantes)</label>
+
+      @for (t of pendingTasks(); track t.id; let i = $index) {
+        <div class="task-row" draggable="true" (dragstart)="onDragStart(i)" (dragover)="onDragOver($event, i)" (dragend)="onDragEnd()">
+          <span class="task-grip">
+            <span></span><span></span><span></span>
+          </span>
+          <div class="task-body">
+            <input class="task-input" [value]="t.name" (input)="updateTaskName(t.id, ($any($event.target).value))" [disabled]="spinning()" placeholder="Nom de la tâche" />
+            <div class="task-meta">
+              <span class="label label--inline">Complexité</span>
+              <input class="weight-slider" type="range" min="1" max="10" [value]="t.complexity" (input)="updateTaskComplexity(t.id, +($any($event.target).value))" [disabled]="spinning()" />
+              <span class="weight-value">{{ t.complexity }}</span>
+            </div>
+          </div>
+          <button class="task-del-btn" (click)="removeTask(t.id)">&times;</button>
+        </div>
+      } @empty {
+        <div class="list-empty">Aucune tâche. Ajoutez-en une !</div>
+      }
+
+      @if (doneTasks().length > 0) {
+        <div class="done-section">
+          <label class="label">Terminées ({{ doneTasks().length }})</label>
+          @for (t of doneTasks(); track t.id) {
+            <div class="task-row task--done" (click)="recoverTask(t.id)">
+              <div class="task-body">
+                <span class="task-input">{{ t.name }}</span>
+              </div>
+              <button class="task-del-btn" (click)="removeTask(t.id); $event.stopPropagation()">&times;</button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </aside>
+</div>
