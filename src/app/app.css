@@ -9,22 +9,43 @@
 
 .logo { height: 24px; }
 
+.header-left {
+  display: flex; align-items: center; gap: 14px;
+}
+
+.header-title {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 0.75rem; color: rgba(255,255,255,0.7);
+  font-weight: 500; letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.header-link {
+  color: #fff; text-decoration: none;
+  font-weight: 600; transition: color 0.2s;
+}
+.header-link:hover { color: #18ffff; }
+
 .header-actions {
-  display: flex; gap: 10px; align-items: center;
+  display: flex; gap: 8px; align-items: center;
 }
 
 .header-btn {
   background: none; border: 1.5px solid rgba(255,255,255,0.2);
   border-radius: 8px; color: rgba(255,255,255,0.45);
-  width: 32px; height: 32px; display: flex;
-  align-items: center; justify-content: center;
+  padding: 6px 10px; display: flex;
+  align-items: center; gap: 5px;
   cursor: pointer; transition: all 0.2s;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 0.7rem; font-weight: 600; white-space: nowrap;
 }
 
 .header-btn:hover {
   border-color: #18ffff; color: #18ffff;
   background: rgba(24,255,255,0.08);
 }
+
+.header-btn svg { flex-shrink: 0; }
 
 /* ─── LAYOUT ─── */
 
@@ -108,6 +129,23 @@
 
 .btn--ghost { background: none; color: #aaa; font-size: 0.7rem; padding: 4px 8px; }
 .btn--ghost:hover { color: #333; }
+
+/* ─── TIPS ─── */
+
+.tip {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 8px 10px; background: #fff;
+  border: 1px solid #18ffff40; border-radius: 8px;
+  font-size: 0.75rem; color: #888; line-height: 1.4;
+  animation: fadeIn 0.25s ease;
+}
+
+.tip-close {
+  background: none; border: none; color: #ccc;
+  font-size: 0.9rem; cursor: pointer; padding: 0;
+  line-height: 1; flex-shrink: 0; margin-top: 1px;
+}
+.tip-close:hover { color: #ff3e96; }
 
 /* ─── MEMBERS ─── */
 
@@ -335,9 +373,11 @@
 @media (width < 768px) {
   .header { height: 44px; padding: 0 12px; }
   .logo { height: 18px; }
+  .header-title { font-size: 0.65rem; gap: 8px; }
+  .header-left { gap: 10px; }
 
-  .header-btn { width: 28px; height: 28px; }
-  .header-btn svg { width: 14px; height: 14px; }
+  .header-btn { padding: 4px 7px; font-size: 0.65rem; gap: 3px; }
+  .header-btn svg { width: 13px; height: 13px; }
 
   .layout {
     flex-direction: column;

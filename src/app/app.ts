@@ -2,6 +2,7 @@ import { Component, computed, signal, effect, ElementRef, viewChild, afterNextRe
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 const STORAGE_KEY = 'task-wheel-data';
+const TIPS_KEY = 'task-wheel-tips';
 
 interface Member {
   name: string;
@@ -55,6 +56,7 @@ export class App {
   readonly spinning = signal(false);
   readonly draggedIdx = signal<number | null>(null);
   readonly historyVisible = signal(true);
+  readonly dismissedTips = signal<string[]>([]);
 
   readonly available = computed(() => this.members().filter(m => !m.busy));
   readonly busyList = computed(() => this.members().filter(m => m.busy));
@@ -71,10 +73,15 @@ export class App {
 
   constructor() {
     this.loadState();
+    this.loadTips();
+
+    const empty = this.members().length === 0 && this.tasks().length === 0;
+    if (empty) this.resetWithDefaults();
 
     effect(() => { this.members(); this.saveState(); this.scheduleDraw(); });
     effect(() => { this.tasks(); this.saveState(); });
     effect(() => { this.history(); this.saveState(); });
+    effect(() => { this.dismissedTips(); this.saveTips(); });
 
     afterNextRender(() => {
       this.scheduleDraw();
@@ -105,6 +112,21 @@ export class App {
       tasks: this.tasks(),
       history: this.history()
     }));
+  }
+
+  private loadTips(): void {
+    try {
+      const raw = localStorage.getItem(TIPS_KEY);
+      if (raw) this.dismissedTips.set(JSON.parse(raw));
+    } catch { /* ignore */ }
+  }
+
+  private saveTips(): void {
+    localStorage.setItem(TIPS_KEY, JSON.stringify(this.dismissedTips()));
+  }
+
+  dismissTip(id: string): void {
+    this.dismissedTips.update(list => [...list, id]);
   }
 
   private scheduleDraw(): void {

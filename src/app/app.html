@@ -1,17 +1,24 @@
 <header class="header">
-  <img class="logo" src="https://digitalizers.ch/wp-content/uploads/2023/06/logo-digitalizers-blanc.png" alt="Digitalizers" />
+  <div class="header-left">
+    <span class="header-title"><a class="header-link" href="https://www.linkedin.com/in/ryen-kamkoum/" target="_blank" rel="noopener">Candidature</a> pour</span>
+    <a href="https://digitalizers.ch" target="_blank" rel="noopener">
+      <img class="logo" src="https://digitalizers.ch/wp-content/uploads/2023/06/logo-digitalizers-blanc.png" alt="Digitalizers" />
+    </a>
+  </div>
   <div class="header-actions">
-    <button class="header-btn" title="Réinitialiser avec des valeurs par défaut" (click)="resetWithDefaults()">
+    <button class="header-btn" title="R\u00e9initialiser avec des valeurs par d\u00e9faut" (click)="resetWithDefaults()">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/>
         <path d="M8 4v4l2.5 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
         <path d="M11 2.5L13 4l-2 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
+      <span>Défaut</span>
     </button>
-    <button class="header-btn" title="Réinitialiser complètement" (click)="resetAll()">
+    <button class="header-btn" title="Tout effacer" (click)="resetAll()">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <path d="M3 4h10M5.5 4V3a1 1 0 011-1h3a1 1 0 011 1v1M6 4v8a1 1 0 001 1h2a1 1 0 001-1V4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
+      <span>Vider</span>
     </button>
   </div>
 </header>
@@ -27,6 +34,12 @@
         <input class="input" type="text" placeholder="Prénom" (keyup.enter)="addMember()" [formControl]="nameInput" [disabled]="spinning()" />
         <button class="btn btn--primary" (click)="addMember()" [disabled]="spinning()">+</button>
       </div>
+      @if (!dismissedTips().includes('tip-members')) {
+        <div class="tip">
+          <span>Ajoutez votre équipe. Le poids détermine la probabilité d'être tiré au sort.</span>
+          <button class="tip-close" (click)="dismissTip('tip-members')">&times;</button>
+        </div>
+      }
     </div>
 
     <div class="compact-list">
@@ -86,6 +99,12 @@
       <button class="btn btn--spin" (click)="handleAction()" [disabled]="spinning() || (tasks().length > 0 && allTasksDone())">
         {{ buttonLabel }}
       </button>
+      @if (!dismissedTips().includes('tip-spin')) {
+        <div class="tip">
+          <span>Cliquez pour attribuer la prochaine tâche à un membre disponible.</span>
+          <button class="tip-close" (click)="dismissTip('tip-spin')">&times;</button>
+        </div>
+      }
     </div>
 
     <div class="wheel-subtitle">Qui fait quoi ? La roue décide.</div>
@@ -132,6 +151,12 @@
         <input class="input" type="text" placeholder="Nom de la tâche" (keyup.enter)="addTask()" [formControl]="taskInput" [disabled]="spinning()" />
         <button class="btn btn--primary" (click)="addTask()" [disabled]="spinning()">+</button>
       </div>
+      @if (!dismissedTips().includes('tip-tasks')) {
+        <div class="tip">
+          <span>Ajoutez les tâches et ordonnez-les par glisser-déposer.</span>
+          <button class="tip-close" (click)="dismissTip('tip-tasks')">&times;</button>
+        </div>
+      }
     </div>
 
     <div class="task-list">
