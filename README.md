@@ -6,12 +6,12 @@ Ce projet évalue le processus de *vibe coding* (prompt → résultat), pas la p
 
 ### Accès
 
-*[URL GitHub Pages — à renseigner]*
+*[URL](https://ryen-k.github.io/Task-wheel-DZ/)*
 
 ### Processus de réflexion
 
 L'ensemble de la session de développement est visible ici :  
-*[Lien vers la conversation — à renseigner]*
+*[Lien vers la conversation](https://opncd.ai/share/YWn41YIS)*
 
 ### Stack
 
